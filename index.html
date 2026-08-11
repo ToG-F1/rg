@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔗 Link Rút Gọn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="url"] {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="url"]:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-primary {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .result-box {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-box .label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .result-box .short-url {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .result-box .short-url a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            word-break: break-all;
+        }
+
+        .result-box .short-url a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-copy {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-copy:hover {
+            background: #5a6fd6;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+
+        .history-section {
+            margin-top: 30px;
+            border-top: 2px solid #f0f0f0;
+            padding-top: 20px;
+        }
+
+        .history-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item {
+            background: #f8f9ff;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .history-item:hover {
+            background: #f0f2ff;
+        }
+
+        .history-item .original {
+            color: #555;
+            font-size: 0.9em;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .history-item .short {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-decoration: none;
+        }
+
+        .history-item .short:hover {
+            text-decoration: underline;
+        }
+
+        .history-item .delete-btn {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 0 5px;
+            transition: transform 0.2s;
+        }
+
+        .history-item .delete-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .btn-danger {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 0.9em;
+            padding: 5px 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .btn-danger:hover {
+            background: #fff0f0;
+        }
+
+        .empty-history {
+            text-align: center;
+            color: #aaa;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .btn-primary {
+                width: 100%;
+            }
+
+            .history-item {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .history-item .original {
+                max-width: 100%;
+                white-space: normal;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Link Rút Gọn</h1>
+        <p class="subtitle">Nhập URL dài để tạo link ngắn gọn</p>
+
+        <div class="input-group">
+            <input type="url" id="longUrl" placeholder="https://example.com/duong-link-dai..." required>
+            <button class="btn-primary" onclick="shortenUrl()">Rút Gọn</button>
+        </div>
+
+        <div class="result-box" id="resultBox">
+            <div class="label">✅ Link rút gọn:</div>
+            <div class="short-url">
+                <a href="#" id="shortUrlLink" target="_blank"></a>
+                <button class="btn-copy" onclick="copyToClipboard()">📋 Sao chép</button>
+            </div>
+            <div class="stats">
+                <span id="clickCount">0 lượt click</span>
+                <span id="createdTime"></span>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h3>
+                📜 Lịch sử
+                <button class="btn-danger" onclick="clearHistory()">Xóa tất cả</button>
+            </h3>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Dữ liệu lưu trữ
+        let urlData = JSON.parse(localStorage.getItem('shortUrls')) || {};
+        let currentShortCode = '';
+
+        // Hàm tạo mã ngẫu nhiên
+        function generateShortCode() {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        // Hàm rút gọn URL
+        function shortenUrl() {
+            const longUrl = document.getElementById('longUrl').value.trim();
+            
+            if (!longUrl) {
+                alert('Vui lòng nhập URL!');
+                return;
+            }
+
+            // Kiểm tra URL hợp lệ
+            try {
+                new URL(longUrl);
+            } catch {
+                alert('URL không hợp lệ! Vui lòng nhập đúng định dạng (bao gồm http:// hoặc https://)');
+                return;
+            }
+
+            // Kiểm tra xem URL đã tồn tại chưa
+            let existingCode = null;
+            for (let [code, data] of Object.entries(urlData)) {
+                if (data.originalUrl === longUrl) {
+                    existingCode = code;
+                    break;
+                }
+            }
+
+            if (existingCode) {
+                currentShortCode = existingCode;
+                displayResult(existingCode);
+                return;
+            }
+
+            // Tạo mã mới
+            let shortCode = generateShortCode();
+            while (urlData[shortCode]) {
+                shortCode = generateShortCode();
+            }
+
+            // Lưu dữ liệu
+            urlData[shortCode] = {
+                originalUrl: longUrl,
+                clicks: 0,
+                created: new Date().toLocaleString('vi-VN'),
+                timestamp: Date.now()
+            };
+
+            localStorage.setItem('shortUrls', JSON.stringify(urlData));
+            currentShortCode = shortCode;
+            displayResult(shortCode);
+            renderHistory();
+            document.getElementById('longUrl').value = '';
+        }
+
+        // Hiển thị kết quả
+        function displayResult(shortCode) {
+            const data = urlData[shortCode];
+            if (!data) return;
+
+            const shortUrl = `${window.location.origin}${window.location.pathname}?code=${shortCode}`;
+            document.getElementById('shortUrlLink').href = shortUrl;
+            document.getElementById('shortUrlLink').textContent = shortUrl;
+            document.getElementById('clickCount').textContent = `${data.clicks || 0} lượt click`;
+            document.getElementById('createdTime').textContent = `Tạo lúc: ${data.created}`;
+            document.getElementById('resultBox').classList.add('show');
+        }
+
+        // Sao chép URL
+        function copyToClipboard() {
+            const link = document.getElementById('shortUrlLink').href;
+            navigator.clipboard.writeText(link).then(() => {
+                alert('✅ Đã sao chép link!');
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = link;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✅ Đã sao chép link!');
+            });
+        }
+
+        // Xử lý redirect khi truy cập link rút gọn
+        function handleRedirect() {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+            
+            if (code && urlData[code]) {
+                // Tăng số lượt click
+                urlData[code].clicks = (urlData[code].clicks || 0) + 1;
+                localStorage.setItem('shortUrls', JSON.stringify(urlData));
+                
+                // Redirect đến URL gốc
+                window.location.href = urlData[code].originalUrl;
+                return true;
+            }
+            return false;
+        }
+
+        // Render lịch sử
+        function renderHistory() {
+            const historyList = document.getElementById('historyList');
+            const entries = Object.entries(urlData);
+            
+            if (entries.length === 0) {
+                historyList.innerHTML = '<div class="empty-history">Chưa có link nào được rút gọn</div>';
+                return;
+            }
+
+            // Sắp xếp theo thời gian tạo mới nhất
+            entries.sort((a, b) => b[1].timestamp - a[1].timestamp);
+
+            historyList.innerHTML = entries.map(([code, data]) => {
+                const shortUrl = `${window.location.origin}${window.location.pathname}?code=${code}`;
+                return `
+                    <div class="history-item">
+                        <span class="original">${data.originalUrl}</span>
+                        <a href="${shortUrl}" target="_blank" class="short">/${code}</a>
+                        <span style="color:#999;font-size:0.8em;">${data.clicks || 0} clicks</span>
+                        <button class="delete-btn" onclick="deleteUrl('${code}')">✕</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Xóa một URL
+        function deleteUrl(code) {
+            if (confirm('Bạn có chắc muốn xóa link này?')) {
+                delete urlData[code];
+                localStorage.setItem('shortUrls', JSON.stringify(urlData));
+                renderHistory();
+                if (currentShortCode === code) {
+                    document.getElementById('resultBox').classList.remove('show');
+                }
+            }
+        }
+
+        // Xóa tất cả
+        function clearHistory() {
+            if (confirm('Bạn có chắc muốn xóa tất cả link?')) {
+                urlData = {};
+                localStorage.setItem('shortUrls', JSON.stringify(urlData));
+                renderHistory();
+                document.getElementById('resultBox').classList.remove('show');
+            }
+        }
+
+        // Xử lý Enter
+        document.getElementById('longUrl').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                shortenUrl();
+            }
+        });
+
+        // Khởi tạo
+        (function init() {
+            const redirected = handleRedirect();
+            if (!redirected) {
+                renderHistory();
+                // Kiểm tra nếu có code trong URL nhưng không tồn tại
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('code')) {
+                    alert('❌ Link rút gọn không tồn tại hoặc đã bị xóa!');
+                    // Xóa param trên URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
